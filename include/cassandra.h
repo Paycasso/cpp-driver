@@ -175,6 +175,12 @@ typedef enum CassValueType_ {
   CASS_VALUE_TYPE_SET       = 0x0022
 } CassValueType;
 
+typedef enum CassBatchType_ {
+  CASS_BATCH_TYPE_LOGGED    = 0,
+  CASS_BATCH_TYPE_UNLOGGED  = 1,
+  CASS_BATCH_TYPE_COUNTER   = 2
+} CassBatchType;
+
 typedef enum CassCompression_ {
   CASS_COMPRESSION_NONE   = 0,
   CASS_COMPRESSION_SNAPPY = 1,
@@ -544,7 +550,8 @@ cass_statement_new(CassString statement,
                    CassConsistency consistency);
 
 /**
- * Frees a statement instance.
+ * Frees a statement instance. Statements can be immediately freed after
+ * being prepared, executed or added to a batch.
  *
  * @param[in] statement
  */
@@ -765,18 +772,21 @@ cass_prepared_bind(const CassPrepared* prepared,
  ***********************************************************************************/
 
 /**
- * Creates a new batch statement.
+ * Creates a new batch statement with batch type.
  *
  * @param[in] consistency The statement's read/write consistency.
+ * @param[in] type The batch type.
  * @return Returns a batch statement that must be freed.
  *
  * @see cass_batch_free()
  */
 CASS_EXPORT CassBatch*
-cass_batch_new(CassConsistency consistency);
+cass_batch_new(CassConsistency consistency,
+               CassBatchType type);
 
 /**
- * Frees a batch instance.
+ * Frees a batch instance. Batches can be immediately freed after being
+ * executed.
  *
  * @param[in] batch
  */

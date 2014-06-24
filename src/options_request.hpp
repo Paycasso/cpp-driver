@@ -23,22 +23,11 @@ namespace cass {
 
 struct OptionsRequest : public MessageBody {
   OptionsRequest()
-    : MessageBody(CQL_OPCODE_OPTIONS) {}
+      : MessageBody(CQL_OPCODE_OPTIONS) {}
 
-  bool
-  consume(
-      char*  buffer,
-      size_t size) {
-    (void) buffer;
-    (void) size;
-    return true;
-  }
-
-  bool
-  prepare(
-      size_t  reserved,
-      char**  output,
-      size_t& size) {
+  bool prepare(size_t reserved, char** output, size_t& size) {
+    size = reserved;
+    *output = new char[size];
     return true;
   }
 };

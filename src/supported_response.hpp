@@ -29,13 +29,9 @@ struct SupportedResponse : public MessageBody {
   std::list<std::string> versions;
 
   SupportedResponse()
-    : MessageBody(CQL_OPCODE_SUPPORTED) {}
+      : MessageBody(CQL_OPCODE_SUPPORTED) {}
 
-  bool
-  consume(
-      char*  buffer,
-      size_t size) {
-    (void) size;
+  bool consume(char* buffer, size_t size) {
     string_multimap_t supported;
 
     decode_string_multimap(buffer, supported);
@@ -49,17 +45,6 @@ struct SupportedResponse : public MessageBody {
       versions = it->second;
     }
     return true;
-  }
-
-  bool
-  prepare(
-      size_t  reserved,
-      char**  output,
-      size_t& size) {
-    (void) reserved;
-    (void) output;
-    (void) size;
-    return false;
   }
 };
 

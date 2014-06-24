@@ -27,39 +27,15 @@ namespace cass {
 
 struct StartupRequest : public MessageBody {
   std::unique_ptr<char> guard;
-  std::string           version;
-  std::string           compression;
+  std::string version;
+  std::string compression;
 
   StartupRequest()
-    : MessageBody(CQL_OPCODE_STARTUP)
-    , version("3.0.0")
-    , compression("") {}
+      : MessageBody(CQL_OPCODE_STARTUP)
+      , version("3.0.0")
+      , compression("") {}
 
-  bool
-  consume(
-      char*  buffer,
-      size_t size) {
-    (void) size;
-
-    OptionsCollection options;
-    decode_string_map(buffer, options);
-    OptionsCollection::const_iterator it = options.find("COMPRESSION");
-    if (it != options.end()) {
-      compression = it->second;
-    }
-
-    it = options.find("CASS_VERSION");
-    if (it != options.end()) {
-      version = it->second;
-    }
-    return true;
-  }
-
-  bool
-  prepare(
-      size_t  reserved,
-      char**  output,
-      size_t& size) {
+  bool prepare(size_t reserved, char** output, size_t& size) {
     size = reserved + sizeof(int16_t);
 
     std::map<std::string, std::string> options;
@@ -82,7 +58,7 @@ struct StartupRequest : public MessageBody {
     return true;
   }
 
- private:
+private:
   typedef std::map<std::string, std::string> OptionsCollection;
 };
 
