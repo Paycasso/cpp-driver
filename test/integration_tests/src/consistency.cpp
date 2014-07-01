@@ -50,32 +50,32 @@ BOOST_AUTO_TEST_CASE(simple_two_nodes)
     pt.create_schema(session.get(), 1); // replication_factor = 1
     
     {
-        CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_ONE);	// Should work
-        CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_ONE);	// Should work
-        BOOST_CHECK_EQUAL(init_result,  CASS_OK);
-        BOOST_CHECK_EQUAL(query_result, CASS_OK);
+      CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_ONE);	// Should work
+      CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_ONE);	// Should work
+      BOOST_CHECK_EQUAL(init_result,  CASS_OK);
+      BOOST_CHECK_EQUAL(query_result, CASS_OK);
     }
     {
-      CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_ANY);  // Should work
-      CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_ANY);  // Should fail (ANY is for writing only)
+      CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_ANY);  // Should work
+      CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_ANY);  // Should fail (ANY is for writing only)
       BOOST_CHECK_EQUAL(init_result, CASS_OK);
       BOOST_CHECK(query_result != CASS_OK);
     }
     {
-      CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_LOCAL_QUORUM);  // Should fail (LOCAL_QUORUM is incompatible with SimpleStrategy)
-      CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_LOCAL_QUORUM);  // Should fail (see above)
+      CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_LOCAL_QUORUM);  // Should fail (LOCAL_QUORUM is incompatible with SimpleStrategy)
+      CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_LOCAL_QUORUM);  // Should fail (see above)
       BOOST_CHECK(init_result  != CASS_OK);
       BOOST_CHECK(query_result != CASS_OK);
     }
     {
-      CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_EACH_QUORUM);  // Should fail (EACH_QUORUM is incompatible with SimpleStrategy)
-      CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_EACH_QUORUM);  // Should fail (see above)
+      CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_EACH_QUORUM);  // Should fail (EACH_QUORUM is incompatible with SimpleStrategy)
+      CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_EACH_QUORUM);  // Should fail (see above)
       BOOST_CHECK(init_result  != CASS_OK);
       BOOST_CHECK(query_result != CASS_OK);
     }
     {
-      CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_THREE);  // Should fail (N=2, RF=1)
-      CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_THREE);  // Should fail (N=2, RF=1)
+      CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_THREE);  // Should fail (N=2, RF=1)
+      CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_THREE);  // Should fail (N=2, RF=1)
       BOOST_CHECK(init_result  != CASS_OK);
       BOOST_CHECK(query_result != CASS_OK);
     }
@@ -97,8 +97,9 @@ BOOST_AUTO_TEST_CASE(one_node_down)
     pt.create_schema(session.get(), 3); // replication_factor = 3
     
     {
-        CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_ONE);	// Should work (N=3, RF=3)
-        CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_ONE);	// Should work (N=3, RF=3)
+        // Sanity check
+        CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_ONE);	// Should work (N=3, RF=3)
+        CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_ONE);	// Should work (N=3, RF=3)
         BOOST_CHECK_EQUAL(init_result,  CASS_OK);
         BOOST_CHECK_EQUAL(query_result, CASS_OK);
     }
@@ -107,26 +108,26 @@ BOOST_AUTO_TEST_CASE(one_node_down)
     boost::this_thread::sleep(boost::posix_time::seconds(20));	// wait for node to be down
 
     {
-        CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_ONE);	// Should work (N=2, RF=3)
-        CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_ONE);	// Should work (N=2, RF=3)
+        CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_ONE);	// Should work (N=2, RF=3)
+        CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_ONE);	// Should work (N=2, RF=3)
         BOOST_CHECK_EQUAL(init_result,  CASS_OK);
         BOOST_CHECK_EQUAL(query_result, CASS_OK);
     }
     {
-        CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_TWO);	// Should work (N=2, RF=3)
-        CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_TWO);	// Should work (N=2, RF=3)
+        CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_TWO);	// Should work (N=2, RF=3)
+        CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_TWO);	// Should work (N=2, RF=3)
         BOOST_CHECK_EQUAL(init_result,  CASS_OK);
         BOOST_CHECK_EQUAL(query_result, CASS_OK);
     }
     {
-        CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_ALL);	// Should fail (N=2, RF=3)
-        CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_ALL);	// Should fail (N=2, RF=3)
+        CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_ALL);	// Should fail (N=2, RF=3)
+        CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_ALL);	// Should fail (N=2, RF=3)
         BOOST_CHECK(init_result  != CASS_OK);
         BOOST_CHECK(query_result != CASS_OK);
     }
     {
-        CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_QUORUM);	// Should work (N=2, RF=3, quorum=2)
-        CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_QUORUM);	// Should work (N=2, RF=3, quorum=2)
+        CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_QUORUM);	// Should work (N=2, RF=3, quorum=2)
+        CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_QUORUM);	// Should work (N=2, RF=3, quorum=2)
         BOOST_CHECK_EQUAL(init_result,  CASS_OK);
         BOOST_CHECK_EQUAL(query_result, CASS_OK);
     }
@@ -148,8 +149,9 @@ BOOST_AUTO_TEST_CASE(two_nodes_down)
     pt.create_schema(session.get(), 3); // replication_factor = 3
     
     {
-        CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_ONE);	// Should work (N=3, RF=3)
-        CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_ONE);	// Should work (N=3, RF=3)
+        // Sanity check
+        CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_ONE);	// Should work (N=3, RF=3)
+        CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_ONE);	// Should work (N=3, RF=3)
         BOOST_CHECK_EQUAL(init_result,  CASS_OK);
         BOOST_CHECK_EQUAL(query_result, CASS_OK);
     }
@@ -159,20 +161,20 @@ BOOST_AUTO_TEST_CASE(two_nodes_down)
     boost::this_thread::sleep(boost::posix_time::seconds(20));	// wait for nodes to be down
     
     {
-        CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_ONE);	// Should work (N=1, RF=3)
-        CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_ONE);	// Should work (N=1, RF=3)
+        CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_ONE);	// Should work (N=1, RF=3)
+        CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_ONE);	// Should work (N=1, RF=3)
         BOOST_CHECK_EQUAL(init_result,  CASS_OK);
         BOOST_CHECK_EQUAL(query_result, CASS_OK);
     }
     {
-        CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_TWO);	// Should fail (N=1, RF=3)
-        CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_TWO);	// Should fail (N=1, RF=3)
+        CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_TWO);	// Should fail (N=1, RF=3)
+        CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_TWO);	// Should fail (N=1, RF=3)
         BOOST_CHECK(init_result  != CASS_OK);
         BOOST_CHECK(query_result != CASS_OK);
     }
     {
-        CassError init_result  = pt.init(session.get(),  12, CASS_CONSISTENCY_QUORUM);	// Should fail (N=1, RF=3, quorum=2)
-        CassError query_result = pt.query(session.get(), 12, CASS_CONSISTENCY_QUORUM);	// Should fail (N=1, RF=3, quorum=2)
+        CassError init_result  = pt.init_return_error(session.get(),  12, CASS_CONSISTENCY_QUORUM);	// Should fail (N=1, RF=3, quorum=2)
+        CassError query_result = pt.query_return_error(session.get(), 12, CASS_CONSISTENCY_QUORUM);	// Should fail (N=1, RF=3, quorum=2)
         BOOST_CHECK(init_result  != CASS_OK);
         BOOST_CHECK(query_result != CASS_OK);
     }

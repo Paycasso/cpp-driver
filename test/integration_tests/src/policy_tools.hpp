@@ -8,13 +8,20 @@ struct policy_tool {
   void show_coordinators();	// show what queries went to what node IP.
   void reset_coordinators();
   
-  CassError
+  void
   init(
        CassSession* session,
        int n,
        CassConsistency cl,
        bool batch = false);
 
+  CassError
+  init_return_error(
+                    CassSession* session,
+                    int n,
+                    CassConsistency cl,
+                    bool batch = false);
+    
   void
   create_schema(
                 CassSession* session,
@@ -33,9 +40,15 @@ struct policy_tool {
                        CassInet coord_addr,
                        int n);
 
-  CassError
+  void
   query(
         CassSession* session,
         int n,
         CassConsistency cl);
+
+  CassError
+  query_return_error(
+                     CassSession* session,
+                     int n,
+                     CassConsistency cl);
 };
