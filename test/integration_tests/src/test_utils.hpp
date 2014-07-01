@@ -411,12 +411,13 @@ struct SingleSessionTest : MultipleNodesTest {
 
 const char* get_value_type(CassValueType type);
 
-void execute_query(CassSession* session,
-                   const std::string& query,
-                   CassResultPtr* result = nullptr,
-                   CassConsistency consistency = CASS_CONSISTENCY_ONE);
+CassError execute_query(CassSession* session,
+                        const std::string& query,
+                        CassResultPtr* result = nullptr,
+                        CassConsistency consistency = CASS_CONSISTENCY_ONE);
 
 void wait_and_check_error(CassFuture* future, cass_duration_t timeout = 10 * ONE_SECOND_IN_MICROS);
+CassError wait_and_return_error(CassFuture* future, cass_duration_t timeout = 10 * ONE_SECOND_IN_MICROS);
 
 inline CassBytes bytes_from_string(const char* str) {
   return cass_bytes_init(reinterpret_cast<const cass_uint8_t*>(str), strlen(str));

@@ -143,16 +143,17 @@ SingleSessionTest::~SingleSessionTest() {
    cass_future_wait(close_future.get());
 }
 
-void execute_query(CassSession* session,
+CassError execute_query(CassSession* session,
                    const std::string& query,
                    CassResultPtr* result,
                    CassConsistency consistency) {
   CassStatementPtr statement(cass_statement_new(cass_string_init(query.c_str()), 0, consistency));
   CassFuturePtr future(cass_session_execute(session, statement.get()));
-  wait_and_check_error(future.get());
+  CassError rc = wait_and_return_error(future.get());
   if(result != nullptr) {
     result->reset(cass_future_get_result(future.get()));
   }
+  return rc;
 }
 
 void wait_and_check_error(CassFuture* future, cass_duration_t timeout) {
@@ -164,6 +165,13 @@ void wait_and_check_error(CassFuture* future, cass_duration_t timeout) {
     CassString message = cass_future_error_message(future);
     BOOST_FAIL("Error occured during query '" << std::string(message.data, message.length) << "' (" << boost::format("0x%08X") % code << ")");
   }
+}
+
+CassError wait_and_return_error(CassFuture* future, cass_duration_t timeout) {
+  if(!cass_future_wait_timed(future, timeout)) {
+      return CASS_ERROR_LIB_REQUEST_TIMED_OUT;
+  }
+  return cass_future_error_code(future);
 }
 
 std::string string_from_time_point(std::chrono::system_clock::time_point time) {

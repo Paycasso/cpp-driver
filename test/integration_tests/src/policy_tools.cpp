@@ -32,7 +32,7 @@ policy_tool::create_schema(
                               str(boost::format("CREATE TABLE %s (k int PRIMARY KEY, i int)") % test_utils::SIMPLE_TABLE));
 }
 
-int
+CassError
 policy_tool::init(
      CassSession* session,
      int n,
@@ -53,12 +53,15 @@ policy_tool::init(
     for (int i = 0; i < n; ++i)
     {
         test_utils::CassResultPtr result;
-        test_utils::execute_query(session,
-                                  query_string,
-                                  &result,
-                                  cl);
+        CassError rc = test_utils::execute_query(session,
+                                                 query_string,
+                                                 &result,
+                                                 cl);
+        if (rc != CASS_OK) {
+            return rc;
+        }
     }
-    return 0;
+    return CASS_OK;
 }
 
 void
@@ -91,7 +94,7 @@ policy_tool::assertQueriedAtLeast(
     BOOST_REQUIRE(queried >= n);
 }
 
-int
+CassError
 policy_tool::query(
       CassSession* session,
       int n,
@@ -103,12 +106,16 @@ policy_tool::query(
                                                       cass_string_init(str(boost::format("SELECT * FROM %s WHERE k = 0") % test_utils::SIMPLE_TABLE).c_str()),
                                                       0, cl));
         test_utils::CassFuturePtr future(cass_session_execute(session, statement.get()));
-        test_utils::wait_and_check_error(future.get());
+        CassError rc = test_utils::wait_and_return_error(future.get());
+        
+        if (rc != CASS_OK) {
+            return rc;
+        }
         
         CassInet sender;
         cass_future_get_client(future.get(), &sender);
         add_coordinator(sender);
     }
-    return 0;
+    return CASS_OK;
 }
 
